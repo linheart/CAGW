@@ -1,13 +1,8 @@
 #ifndef POLYBUIS_SQUARE_H // POLYBUIS_SQUARE_H
 #define POLYBUIS_SQUARE_H
 
-#include <iostream>
-#include <vector>
-#include <string>
-#include <algorithm>
-#include <locale>
+#include "common.h"
 
-using namespace std;
 using square = vector<vector<wchar_t>>;
 
 

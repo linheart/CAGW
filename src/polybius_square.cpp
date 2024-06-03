@@ -1,4 +1,5 @@
 #include "../include/polybius_square.h"
+#include "../include/common.h"
 
 wstring polybius_square_decryption(const wstring text, const square sq) {
   wstring decrypted_text = L"";
