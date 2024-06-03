@@ -1,5 +1,6 @@
-#include "../include/common.h"
 #include "../include/tabular_encrypt.h"
+
+#include "../include/common.h"
 
 vector<int> make_alphabet_num(wstring key_word) {
   size_t size = key_word.size();
@@ -32,7 +33,7 @@ Table make_table(const wstring text, const wstring key_word) {
   int cols = key_word.size();
   Table table(cols);
   vector<int> nums = make_alphabet_num(key_word);
-  
+
   size_t index = 0;
   for (int i = 0; i < cols; i++) {
     table[i].first = nums[i];
@@ -44,5 +45,5 @@ Table make_table(const wstring text, const wstring key_word) {
       j++;
     }
   }
-  return table;  
+  return table;
 }
