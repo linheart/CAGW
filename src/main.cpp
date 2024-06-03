@@ -20,20 +20,13 @@ int main() {
   wstring input;
   getline(wcin, input);
 
-  Table table = make_table(input, key_word);
+  wstring text = up_to_lower(input);
 
-  sort(table.begin(), table.end(),
-       [](const pair<int, vector<wchar_t>> a,
-          const pair<int, vector<wchar_t>> b) { return a.first < b.first; });
+  wstring encrypted_text = encrypt_text(text, key_word);
+  wcout << encrypted_text << endl;
 
-  for (size_t i = 0; i < key_word.size(); i++) {
-    if (table[i].second.size() > 0) {
-      for (size_t j = 0; j < table[i].second.size(); j++) {
-        wcout << table[i].second[j];
-      }
-      wcout << ' ';
-    }
-  }
+  wstring decrypter_text = decrypt_text(encrypted_text, key_word);
+  wcout << decrypter_text << endl;
 
   /*
     wstring text = up_to_lower(input);
