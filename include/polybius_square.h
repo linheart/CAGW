@@ -11,7 +11,5 @@ int find_symb_numb(const wchar_t, const square);
 wstring polybius_square_encryption(const wstring, const square);
 square en_square();
 square ru_square();
-wstring up_to_lower(const wstring);
-
 
 #endif //POLYBUIS_SQUARE_H

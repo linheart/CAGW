@@ -18,12 +18,6 @@ vector<int> make_alphabet_num(wstring key_word) {
   return nums;
 }
 
-void remove_characters(wstring &text) {
-  text.erase(remove_if(text.begin(), text.end(),
-                       [](wchar_t c) { return iswspace(c); }),
-             text.end());
-}
-
 void reverse_sort_table(Table &table, const wstring text, vector<int> nums) {
   size_t rows = table.size();
   size_t cols = table[0].second.size();
@@ -88,8 +82,8 @@ Table make_table(const wstring text, const wstring key_word) {
   return table;
 }
 
-wstring decrypt_text(wstring text, const wstring key_word) {
-  remove_characters(text);
+wstring tab_decrypt(wstring text, const wstring key_word) {
+  remove_spaces(text);
 
   Table table = init_table(text, key_word);
   vector<int> nums = make_alphabet_num(key_word);
@@ -110,8 +104,8 @@ wstring decrypt_text(wstring text, const wstring key_word) {
   return encrypted_text;
 }
 
-wstring encrypt_text(wstring text, const wstring key_word) {
-  remove_characters(text);
+wstring tab_encrypt(wstring text, const wstring key_word) {
+  remove_spaces(text);
 
   Table table = make_table(text, key_word);
   size_t rows = key_word.size();

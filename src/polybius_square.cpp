@@ -64,11 +64,3 @@ square ru_square() {
 
   return sq;
 }
-
-wstring up_to_lower(const wstring input) {
-  wstring lower_cased = L"";
-  for (wchar_t c : input) {
-    lower_cased += tolower(c, locale());
-  }
-  return lower_cased;
-}

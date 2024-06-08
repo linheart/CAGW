@@ -8,9 +8,10 @@
 #include <locale>
 #include <limits>
 
-
 using namespace std;
 
+void remove_spaces(wstring &text);
+wstring up_to_lower(const wstring);
 
 
 #endif // COMMON_H
