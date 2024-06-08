@@ -18,21 +18,39 @@ vector<int> make_alphabet_num(wstring key_word) {
   return nums;
 }
 
-int counting_characters(const wstring text) {
-  int count = 0;
-  for (auto wch : text) {
-    if (!iswspace(wch)) {
-      count++;
-    }
-  }
-  return count;
+void remove_characters(wstring &text) {
+  text.erase(remove_if(text.begin(), text.end(),
+                       [](wchar_t c) { return iswspace(c); }),
+             text.end());
 }
 
-void reverse_sort_table(Table &table, const wstring text) {
-  for (size_t i = 0, index = 0; i < table[0].second.size(); i++) {
-    for (size_t j = 0; j < table.size() && text[index]; j++) {
-      if (text[index] == L' ') {
-        index++;
+void reverse_sort_table(Table &table, const wstring text, vector<int> nums) {
+  size_t rows = table.size();
+  size_t cols = table[0].second.size();
+  size_t text_size = text.size();
+  int missed_let = cols * rows - text_size;
+  size_t bad_words = ceil((float)(missed_let) / cols);
+  vector<pair<int, int>> bad_word_nums(bad_words);
+
+  for (size_t i = 1; i < bad_words; i++) {
+    bad_word_nums[i - 1] = {nums[rows - i], cols};
+    missed_let -= cols;
+  }
+
+  if (bad_words) {
+    bad_word_nums.back() = {nums[rows - bad_words], missed_let};
+  }
+
+  for (size_t i = 0, index = 0; i < cols; i++) {
+    for (size_t j = 0; j < rows && text[index]; j++) {
+      auto it = find_if(
+          bad_word_nums.begin(), bad_word_nums.end(),
+          [=](const pair<int, int> p) { return p.first == table[j].first; });
+
+      if (it != bad_word_nums.end() && it->second > 0 &&
+          i == cols - it->second) {
+        it->second--;
+        continue;
       }
       table[j].second[i] = text[index++];
     }
@@ -47,7 +65,7 @@ void sort_table(Table &table) {
 
 Table init_table(const wstring text, const wstring key_word) {
   int rows = key_word.size();
-  int cols = ceil((float)counting_characters(text) / rows);
+  int cols = ceil((float)text.size() / rows);
   Table table(rows, {0, vector<wchar_t>(cols)});
   vector<int> nums = make_alphabet_num(key_word);
 
@@ -64,21 +82,20 @@ Table make_table(const wstring text, const wstring key_word) {
   for (int i = 0; i < key_word.size(); i++) {
     for (int j = 0; j < table[0].second.size() && index < text.size();
          index++) {
-      if (iswspace(text[index])) {
-        continue;
-      }
       table[i].second[j++] = text[index];
     }
   }
   return table;
 }
 
-wstring decrypt_text(const wstring text, const wstring key_word) {
+wstring decrypt_text(wstring text, const wstring key_word) {
+  remove_characters(text);
+
   Table table = init_table(text, key_word);
   vector<int> nums = make_alphabet_num(key_word);
 
   sort_table(table);
-  reverse_sort_table(table, text);
+  reverse_sort_table(table, text, nums);
 
   wstring encrypted_text = L"";
   for (auto num : nums) {
@@ -93,9 +110,10 @@ wstring decrypt_text(const wstring text, const wstring key_word) {
   return encrypted_text;
 }
 
-wstring encrypt_text(const wstring text, const wstring key_word) {
-  Table table = make_table(text, key_word);
+wstring encrypt_text(wstring text, const wstring key_word) {
+  remove_characters(text);
 
+  Table table = make_table(text, key_word);
   size_t rows = key_word.size();
   size_t cols = table[0].second.size();
   wstring result_string = L"";
