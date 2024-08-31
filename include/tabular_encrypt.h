@@ -2,13 +2,11 @@
 #define TABULAR_ENCRYPT_H
 
 #include "common.h"
-#include <utility> 
-#include <cmath>
 
 using Table = vector<pair<int, vector<wchar_t>>>;
 
 vector<int> make_alphabet_num(wstring);
-void remove_spaces(wstring&);
+void remove_spaces(wstring &);
 void reverse_sort_table(Table &, const wstring, vector<int>);
 void sort_table(Table &);
 Table init_table(const wstring, const wstring);

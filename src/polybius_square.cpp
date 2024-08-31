@@ -1,37 +1,57 @@
 #include "../include/polybius_square.h"
 
-#include "../include/common.h"
-
 wstring polybius_square_decryption(const wstring text, const square sq) {
   wstring decrypted_text = L"";
-  for (size_t i = 0; i < text.size(); i += 2) {
-    int num = stoi(text.substr(i, 2));
-    decrypted_text += sq[num / 10 - 1][num % 10 - 1];
+  size_t index = 0;
+  size_t size = sq.size();
+  for (wchar_t wch : text) {
+    if (iswalpha(wch)) {
+      index = symb_num(wch, sq);
+      if (index != static_cast<size_t>(-1)) {
+        if (sq[(index / 10 - 1) % size][index % 10] == L'-') {
+          index -= 10;
+        }
+        decrypted_text += sq[(index / 10 - 1) % size][index % 10];
+      } else {
+        decrypted_text += wch;
+      }
+    } else {
+      decrypted_text += wch;
+    }
   }
   return decrypted_text;
 }
 
-int find_symb_numb(const wchar_t target, const square sq) {
-  for (size_t i = 0; i < sq.size(); i++) {
-    for (size_t j = 0; j < sq[i].size(); j++) {
-      if (sq[i][j] == target && target != L'-') {
-        return (i + 1) * 10 + j + 1;
+size_t symb_num(const wchar_t target, const square sq) {
+  size_t size = sq.size();
+  size_t index = -1;
+  for (size_t i = 0; i < size; i++) {
+    for (size_t j = 0; j < size && index == -1; j++) {
+      if (sq[i][j] == target) {
+        index = i * 10 + j;
       }
     }
   }
-
-  return 0;
+  return index;
 }
 
 wstring polybius_square_encryption(const wstring text, const square sq) {
   wstring enctypted_text = L"";
-  int num = 0;
-  for (auto wch : text) {
-    num = find_symb_numb(wch, sq);
-    if (num) {
-      enctypted_text += to_wstring(num);
+  size_t size = sq.size();
+  size_t index = 0;
+  for (wchar_t wch : text) {
+    if (iswalpha(wch)) {
+      index = symb_num(wch, sq);
+      if (index != static_cast<size_t>(-1)) {
+        if (sq[(index / 10 + 1) % size][index % 10] == L'-') {
+          index += 10;
+        }
+        enctypted_text += sq[(index / 10 + 1) % size][index % 10];
+      } else {
+        enctypted_text += wch;
+      }
     } else {
-      enctypted_text += L" ";
+      enctypted_text += wch;
     }
   }
   return enctypted_text;
@@ -42,9 +62,11 @@ square en_square() {
   wchar_t letter = L'a';
 
   for (int i = 0; i < 5; i++) {
-    for (int j = 0; j < 5; j++) {
-      sq[i][j] = letter++;
-      if (letter == L'j') letter++;
+    for (int j = 0; j < 5; j++, letter++) {
+      if (letter == L'j') {
+        letter++;
+      }
+      sq[i][j] = letter;
     }
   }
 
@@ -57,8 +79,11 @@ square ru_square() {
 
   for (int i = 0; i < 6; i++) {
     for (int j = 0; j < 6; j++, letter++) {
-      sq[i][j] = letter;
-      if (letter > L'я') sq[i][j] = L'-';
+      if (letter <= L'я') {
+        sq[i][j] = letter;
+      } else {
+        sq[i][j] = L'-';
+      }
     }
   }
 

@@ -1,7 +1,5 @@
 #include "../include/tabular_encrypt.h"
 
-#include "../include/common.h"
-
 vector<int> make_alphabet_num(wstring key_word) {
   size_t size = key_word.size();
   vector<int> nums(size);
@@ -73,10 +71,11 @@ Table init_table(const wstring text, const wstring key_word) {
 Table make_table(const wstring text, const wstring key_word) {
   Table table = init_table(text, key_word);
   size_t index = 0;
-  for (int i = 0; i < key_word.size(); i++) {
-    for (int j = 0; j < table[0].second.size() && index < text.size();
-         index++) {
-      table[i].second[j++] = text[index];
+  size_t key_size = key_word.size();
+  size_t col_size = table[0].second.size();
+  for (size_t i = 0; i < key_size; i++) {
+    for (size_t j = 0; j < col_size && index < text.size(); j++) {
+      table[i].second[j] = text[index++];
     }
   }
   return table;
@@ -111,7 +110,7 @@ wstring tab_encrypt(wstring text, const wstring key_word) {
   size_t rows = key_word.size();
   size_t cols = table[0].second.size();
   wstring result_string = L"";
-  int count = 0;
+  size_t count = 0;
 
   sort_table(table);
 
