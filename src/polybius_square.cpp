@@ -1,19 +1,26 @@
 #include "../include/polybius_square.h"
 
-wstring polybius_square_decryption(const wstring text, const square sq) {
+wstring polybius_square_decryption(const wstring text) {
+  square ru_sq = ru_square();
+  square en_sq = en_square();
+  square sq;
   wstring decrypted_text = L"";
   size_t index = 0;
-  size_t size = sq.size();
+  size_t size;
+
   for (wchar_t wch : text) {
     if (iswalpha(wch)) {
+      sq = isalpha(wch) ? en_sq : ru_sq;
+      size = sq.size();
       index = symb_num(wch, sq);
+      if (index < 10) {
+        index += size * 10;
+      }
       if (index != static_cast<size_t>(-1)) {
         if (sq[(index / 10 - 1) % size][index % 10] == L'-') {
           index -= 10;
         }
         decrypted_text += sq[(index / 10 - 1) % size][index % 10];
-      } else {
-        decrypted_text += wch;
       }
     } else {
       decrypted_text += wch;
@@ -35,20 +42,23 @@ size_t symb_num(const wchar_t target, const square sq) {
   return index;
 }
 
-wstring polybius_square_encryption(const wstring text, const square sq) {
+wstring polybius_square_encryption(const wstring text) {
+  square ru_sq = ru_square();
+  square en_sq = en_square();
+  square sq;
   wstring enctypted_text = L"";
-  size_t size = sq.size();
+  size_t size;
   size_t index = 0;
   for (wchar_t wch : text) {
     if (iswalpha(wch)) {
+      sq = isalpha(wch) ? en_sq : ru_sq;
+      size = sq.size();
       index = symb_num(wch, sq);
       if (index != static_cast<size_t>(-1)) {
         if (sq[(index / 10 + 1) % size][index % 10] == L'-') {
           index += 10;
         }
         enctypted_text += sq[(index / 10 + 1) % size][index % 10];
-      } else {
-        enctypted_text += wch;
       }
     } else {
       enctypted_text += wch;
@@ -88,4 +98,56 @@ square ru_square() {
   }
 
   return sq;
+}
+
+void polybius_menu() {
+  wstring path;
+  wstring text;
+
+  wcout << L"\033[2J\033[0;0f";
+  wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
+
+  while (true) {
+    try {
+      if (choose_method(L"Do you want to read data from a file: (y/n) ")) {
+        wcout << L"Enter the path to the file: ";
+        getline(wcin, path);
+
+        wifstream file(wstring_to_string(path));
+
+        if (!file.is_open()) {
+          throw runtime_error(wstring_to_string(L"Incorrect path"));
+        }
+
+        getline(file, text);
+        file.close();
+
+      } else {
+        wcout << L"Enter the text: ";
+        getline(wcin, text);
+      }
+      wstring encrypted_text = polybius_square_encryption(text);
+      wstring decrypted_text = polybius_square_decryption(encrypted_text);
+
+      if (choose_method(L"Do yow want to write the result to a file? (y/n) ")) {
+        wcout << L"Enter the path to the file: ";
+        getline(wcin, path);
+
+        wofstream file(wstring_to_string(path));
+
+        file << decrypted_text;
+      } else {
+        wcout << L"Cipher text: " << encrypted_text << endl;
+        wcout << L"Plain text: " << decrypted_text << endl;
+      }
+
+      return;
+
+    } catch (const runtime_error &e) {
+      wcout << L"Runtime error: ";
+      print_error(e.what());
+    } catch (const exception &e) {
+      wcout << typeid(e).name() << endl;
+    }
+  }
 }

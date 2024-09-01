@@ -25,5 +25,6 @@ void print_error(const string &);
 bool login();
 void menu();
 void clear_buffer();
+bool choose_method(const wstring &);
 
 #endif // COMMON_H

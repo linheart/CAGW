@@ -1,4 +1,5 @@
 #include "../include/tabular_encrypt.h"
+#include <string>
 
 vector<int> make_alphabet_num(wstring key_word) {
   size_t size = key_word.size();
@@ -128,4 +129,61 @@ wstring tab_encrypt(wstring text, const wstring key_word) {
   }
 
   return result_string;
+}
+
+void tab_menu() {
+  wstring path;
+  wstring key;
+  wstring text;
+
+  wcout << L"\033[2J\033[0;0f";
+  wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
+
+  while (true) {
+    try {
+      if (choose_method(L"Do you want to read data from a file: (y/n) ")) {
+        wcout << L"Enter the path to the file: ";
+        getline(wcin, path);
+
+        wifstream file(wstring_to_string(path));
+
+        if (!file.is_open()) {
+          throw runtime_error(wstring_to_string(L"Incorrect path"));
+        }
+
+        getline(file, key);
+        file.ignore(numeric_limits<streamsize>::max(), L'\n');
+        getline(file, text);
+        file.close();
+
+      } else {
+        wcout << L"Enter the key: ";
+        getline(wcin, key);
+        wcout << L"Enter the text: ";
+        getline(wcin, text);
+      }
+      wstring encrypted_text = tab_encrypt(text, key);
+      wstring decrypted_text = tab_decrypt(encrypted_text, key);
+
+      if (choose_method(L"Do yow want to write the result to a file? (y/n) ")) {
+        wcout << L"Enter the path to the file: ";
+        getline(wcin, path);
+
+        wofstream file(wstring_to_string(path));
+
+        file << decrypted_text;
+      } else {
+        wcout << L"Cipher text: " << encrypted_text << endl;
+        wcout << L"Plain text: " << decrypted_text << endl;
+      }
+
+      return;
+
+    } catch (const runtime_error &e) {
+      wcout << L"Runtime error: ";
+      print_error(e.what());
+    } catch (const exception &e) {
+      wcout << typeid(e).name() << endl;
+    }
+  }
 }

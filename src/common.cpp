@@ -30,3 +30,17 @@ void clear_buffer() {
   wcin.clear();
   wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
 }
+
+bool choose_method(const wstring &text) {
+  wstring method;
+  bool choice;
+
+  wcout << text;
+
+  getline(wcin, method);
+  method = up_to_lower(method);
+  if (method == L"y" || method == L"yes") {
+    return true;
+  }
+  return false;
+}

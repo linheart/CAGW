@@ -13,5 +13,6 @@ Table init_table(const wstring, const wstring);
 Table make_table(const wstring, const wstring);
 wstring tab_decrypt(wstring, const wstring);
 wstring tab_encrypt(wstring, const wstring);
+void tab_menu();
 
 #endif // TABULAR_ENCRYPT_H

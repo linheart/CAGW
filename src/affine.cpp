@@ -1,4 +1,5 @@
 #include "../include/affine.h"
+#include <iostream>
 
 int ex_euclid(int c, int m) {
   int x = 0, y = 1, lastx = 1, lasty = 0, temp;
@@ -58,20 +59,6 @@ wstring affine_encrypt(int a, int b, int m, wstring text) {
   return encrypted_text;
 }
 
-bool choose_method() {
-  wstring method;
-  bool choice;
-
-  wcout << L"Do you want to read data from a file: (y/n) ";
-
-  getline(wcin, method);
-  method = up_to_lower(method);
-  if (method == L"y" || method == L"yes") {
-    return true;
-  }
-  return false;
-}
-
 void affine_menu() {
   unsigned a;
   unsigned b;
@@ -84,19 +71,20 @@ void affine_menu() {
 
   while (true) {
     try {
-      if (choose_method()) {
+      if (choose_method(L"Do you want to read data from a file: (y/n) ")) {
         wcout << L"Enter the path to the file: ";
         getline(wcin, path);
 
         wifstream file(wstring_to_string(path));
 
         if (!file.is_open()) {
-          wcout << "Incorrect path" << endl;
+          throw runtime_error(wstring_to_string(L"Incorrect path"));
         }
 
         if (!(file >> a >> b)) {
-          throw runtime_error("FUCK");
+          throw runtime_error(wstring_to_string(L"Enter a number"));
         }
+
         file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         getline(file, text);
 
@@ -105,6 +93,7 @@ void affine_menu() {
       } else {
         wcout << L"Enter a b: ";
         if (!(wcin >> a >> b)) {
+          clear_buffer();
           throw runtime_error(wstring_to_string(L"Enter a number."));
         }
 
@@ -121,24 +110,30 @@ void affine_menu() {
 
       b %= m;
       wstring encrypted_text = affine_encrypt(a, b, m, text);
-      wcout << encrypted_text << endl;
-
       wstring decrypted_text = affine_decrypt(a, b, m, encrypted_text);
-      wcout << decrypted_text << endl;
+
+      if (choose_method(L"Do yow want to write the result to a file? (y/n) ")) {
+        wcout << L"Enter the path to the file: ";
+        getline(wcin, path);
+
+        wofstream file(wstring_to_string(path));
+
+        file << decrypted_text;
+      } else {
+        wcout << L"Cipher text: " << encrypted_text << endl;
+        wcout << L"Plain text: " << decrypted_text << endl;
+      }
 
       return;
 
     } catch (const runtime_error &e) {
       wcout << L"Runtime error: ";
       print_error(e.what());
-      clear_buffer();
     } catch (const out_of_range &e) {
       wcout << L"Out of range: ";
       print_error(e.what());
-      clear_buffer();
     } catch (const exception &e) {
       wcout << typeid(e).name() << endl;
-      clear_buffer();
     }
   }
 }
