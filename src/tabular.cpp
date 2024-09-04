@@ -1,5 +1,4 @@
 #include "../include/tabular.h"
-#include <string>
 
 vector<int> make_alphabet_num(wstring key_word) {
   size_t size = key_word.size();

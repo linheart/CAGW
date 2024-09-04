@@ -1,6 +1,4 @@
 #include "../include/affine.h"
-#include <iostream>
-#include <string>
 
 int ex_euclid(int c, int m) {
   int x = 0, y = 1, lastx = 1, lasty = 0, temp;
