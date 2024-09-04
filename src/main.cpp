@@ -1,7 +1,7 @@
 #include "../include/affine.h"
 #include "../include/common.h"
 #include "../include/polybius_square.h"
-#include "../include/tabular_encrypt.h"
+#include "../include/tabular.h"
 
 int main() {
   locale::global(locale("ru_RU.UTF-8"));
@@ -41,7 +41,6 @@ bool login() {
 }
 
 void menu() {
-  int choice;
   wcout << L"\033[2J\033[0;0f";
 
   while (true) {
@@ -51,10 +50,7 @@ void menu() {
       wcout << L"3 - Tabular" << endl;
       wcout << L"4 - Quit" << endl;
 
-      if (!(wcin >> choice)) {
-        throw runtime_error(
-            wstring_to_string(L"Incorrect input! Enter a number."));
-      }
+      int choice = input_num();
 
       switch (choice) {
       case 1:
@@ -72,7 +68,7 @@ void menu() {
         throw runtime_error("There's no option!");
       }
     } catch (const runtime_error &e) {
-      wcout << L"Runtime error ";
+      wcout << L"Runtime error: ";
       print_error(e.what());
       clear_buffer();
     } catch (const exception &e) {

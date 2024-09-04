@@ -1,5 +1,6 @@
 #include "../include/affine.h"
 #include <iostream>
+#include <string>
 
 int ex_euclid(int c, int m) {
   int x = 0, y = 1, lastx = 1, lasty = 0, temp;
@@ -62,15 +63,24 @@ wstring affine_encrypt(int a, int b, int m, wstring text) {
 void affine_menu() {
   unsigned a;
   unsigned b;
-  unsigned m = 32;
+  unsigned m = 26;
   wstring path;
   wstring text;
+  wstring result;
 
   wcout << L"\033[2J\033[0;0f";
-  wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
 
   while (true) {
     try {
+      int choise = choose_interaction();
+
+      if (choise == 3) {
+        return;
+      }
+
+      wcout << L"\033[2J\033[0;0f";
+      wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
+
       if (choose_method(L"Do you want to read data from a file: (y/n) ")) {
         wcout << L"Enter the path to the file: ";
         getline(wcin, path);
@@ -92,10 +102,8 @@ void affine_menu() {
 
       } else {
         wcout << L"Enter a b: ";
-        if (!(wcin >> a >> b)) {
-          clear_buffer();
-          throw runtime_error(wstring_to_string(L"Enter a number."));
-        }
+        a = input_num();
+        b = input_num();
 
         wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
         wcout << L"Enter the text: ";
@@ -109,8 +117,12 @@ void affine_menu() {
       }
 
       b %= m;
-      wstring encrypted_text = affine_encrypt(a, b, m, text);
-      wstring decrypted_text = affine_decrypt(a, b, m, encrypted_text);
+
+      if (choise == 1) {
+        result = affine_encrypt(a, b, m, text);
+      } else {
+        result = affine_decrypt(a, b, m, text);
+      }
 
       if (choose_method(L"Do yow want to write the result to a file? (y/n) ")) {
         wcout << L"Enter the path to the file: ";
@@ -118,10 +130,9 @@ void affine_menu() {
 
         wofstream file(wstring_to_string(path));
 
-        file << decrypted_text;
+        file << result;
       } else {
-        wcout << L"Cipher text: " << encrypted_text << endl;
-        wcout << L"Plain text: " << decrypted_text << endl;
+        wcout << result << endl;
       }
 
       return;

@@ -1,4 +1,5 @@
 #include "../include/polybius_square.h"
+#include <string>
 
 wstring polybius_square_decryption(const wstring text) {
   square ru_sq = ru_square();
@@ -103,12 +104,21 @@ square ru_square() {
 void polybius_menu() {
   wstring path;
   wstring text;
+  wstring result;
 
   wcout << L"\033[2J\033[0;0f";
-  wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
 
   while (true) {
     try {
+      int choice = choose_interaction();
+
+      if (choice == 3) {
+        return;
+      }
+
+      wcout << L"\033[2J\033[0;0f";
+      wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
+
       if (choose_method(L"Do you want to read data from a file: (y/n) ")) {
         wcout << L"Enter the path to the file: ";
         getline(wcin, path);
@@ -126,8 +136,12 @@ void polybius_menu() {
         wcout << L"Enter the text: ";
         getline(wcin, text);
       }
-      wstring encrypted_text = polybius_square_encryption(text);
-      wstring decrypted_text = polybius_square_decryption(encrypted_text);
+
+      if (choice == 1) {
+        result = polybius_square_encryption(text);
+      } else {
+        result = polybius_square_decryption(text);
+      }
 
       if (choose_method(L"Do yow want to write the result to a file? (y/n) ")) {
         wcout << L"Enter the path to the file: ";
@@ -135,10 +149,9 @@ void polybius_menu() {
 
         wofstream file(wstring_to_string(path));
 
-        file << decrypted_text;
+        file << result;
       } else {
-        wcout << L"Cipher text: " << encrypted_text << endl;
-        wcout << L"Plain text: " << decrypted_text << endl;
+        wcout << result << endl;
       }
 
       return;

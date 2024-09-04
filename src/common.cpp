@@ -44,3 +44,20 @@ bool choose_method(const wstring &text) {
   }
   return false;
 }
+
+int input_num() {
+  int num;
+  if (!(wcin >> num)) {
+    clear_buffer();
+    throw runtime_error(wstring_to_string(L"Enter a number."));
+  }
+  return num;
+}
+
+int choose_interaction() {
+  wcout << L"1 - Encrypt" << endl;
+  wcout << L"2 - Decrypt" << endl;
+  wcout << L"3 - Back" << endl;
+
+  return input_num();
+}

@@ -26,5 +26,7 @@ bool login();
 void menu();
 void clear_buffer();
 bool choose_method(const wstring &);
+int input_num();
+int choose_interaction();
 
 #endif // COMMON_H
