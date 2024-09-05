@@ -144,6 +144,8 @@ void tab_menu() {
 
       if (choice == 3) {
         return;
+      } else if (choice > 3 || choice < 1) {
+        throw runtime_error("There's no option!");
       }
 
       wcout << L"\033[2J\033[0;0f";

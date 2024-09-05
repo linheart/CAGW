@@ -70,10 +70,12 @@ void affine_menu() {
 
   while (true) {
     try {
-      int choise = choose_interaction();
+      int choice = choose_interaction();
 
-      if (choise == 3) {
+      if (choice == 3) {
         return;
+      } else if (choice > 3 || choice < 1) {
+        throw runtime_error("There's no option!");
       }
 
       wcout << L"\033[2J\033[0;0f";
@@ -116,7 +118,7 @@ void affine_menu() {
 
       b %= m;
 
-      if (choise == 1) {
+      if (choice == 1) {
         result = affine_encrypt(a, b, m, text);
       } else {
         result = affine_decrypt(a, b, m, text);
