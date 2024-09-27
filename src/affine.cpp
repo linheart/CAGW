@@ -1,4 +1,5 @@
 #include "../include/affine.h"
+#include <cstdio>
 
 int ex_euclid(int c, int m) {
   int x = 0, y = 1, lastx = 1, lasty = 0, temp;
@@ -20,6 +21,31 @@ int ex_euclid(int c, int m) {
   return lastx;
 }
 
+int gcd(int a, int b) {
+  if (b == 0) {
+    return a;
+  }
+  return gcd(b, a % b);
+}
+
+int gen_rand_num(int m) {
+  random_device dev;
+  mt19937 rng(dev());
+  uniform_int_distribution<std::mt19937::result_type> dist6(2, m - 1);
+
+  return dist6(rng);
+}
+
+int gen_coprime_num(int m) {
+  int key;
+
+  do {
+    key = gen_rand_num(m);
+  } while (gcd(key, m) != 1);
+
+  return key;
+}
+
 wchar_t determine_letter(wchar_t wch) {
   if (wch >= L'A' && wch <= L'z') {
     wch = iswlower(wch) ? L'a' : L'A';
@@ -29,12 +55,27 @@ wchar_t determine_letter(wchar_t wch) {
   return wch;
 }
 
-wstring affine_decrypt(int a, int b, int m, wstring text) {
+wstring affine_decrypt(int a_ru, int b_ru, int m_ru, int a_en, int b_en,
+                       int m_en, wstring text) {
+  int a;
+  int b;
+  int m;
   wstring decrypted_text = L"";
   wchar_t base;
-  int coprime = (ex_euclid(a, m) % m + m) % m;
+  int coprime;
+
   for (wchar_t symb : text) {
     if (iswalpha(symb)) {
+      if (isalpha(symb)) {
+        a = a_en;
+        b = b_en;
+        m = m_en;
+      } else {
+        a = a_ru;
+        b = b_ru;
+        m = m_ru;
+      }
+      coprime = (ex_euclid(a, m) % m + m) % m;
       base = determine_letter(symb);
       decrypted_text += coprime * ((symb - base) + m - b) % m + base;
     } else {
@@ -44,11 +85,25 @@ wstring affine_decrypt(int a, int b, int m, wstring text) {
   return decrypted_text;
 }
 
-wstring affine_encrypt(int a, int b, int m, wstring text) {
+wstring affine_encrypt(int a_ru, int b_ru, int m_ru, int a_en, int b_en,
+                       int m_en, wstring text) {
+  int a;
+  int b;
+  int m;
+
   wstring encrypted_text = L"";
   wchar_t base;
   for (wchar_t symb : text) {
     if (iswalpha(symb)) {
+      if (isalpha(symb)) {
+        a = a_en;
+        b = b_en;
+        m = m_en;
+      } else {
+        a = a_ru;
+        b = b_ru;
+        m = m_ru;
+      }
       base = determine_letter(symb);
       encrypted_text += (a * (symb - base) + b) % m + base;
     } else {
@@ -59,9 +114,14 @@ wstring affine_encrypt(int a, int b, int m, wstring text) {
 }
 
 void affine_menu() {
-  unsigned a;
-  unsigned b;
-  unsigned m = 26;
+  int m_ru = 32;
+  int a_ru;
+  int b_ru;
+
+  int m_en = 26;
+  int a_en;
+  int b_en;
+
   wstring path;
   wstring text;
   wstring result;
@@ -91,37 +151,42 @@ void affine_menu() {
           throw runtime_error(wstring_to_string(L"Incorrect path"));
         }
 
-        if (!(file >> a >> b)) {
-          throw runtime_error(wstring_to_string(L"Enter a number"));
-        }
-
-        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         getline(file, text);
 
         file.close();
 
       } else {
-        wcout << L"Enter a b: ";
-        a = input_num();
-        b = input_num();
-
-        wcin.ignore(numeric_limits<streamsize>::max(), L'\n');
         wcout << L"Enter the text: ";
         getline(wcin, text);
       }
-      if (a >= m) {
-        throw out_of_range(wstring_to_string(L"A must be less than m"));
-      }
-      if (ex_euclid(a, m) == 1 && a != 1) {
-        throw runtime_error(wstring_to_string(L"The numbers must be coprime"));
-      }
-
-      b %= m;
 
       if (choice == 1) {
-        result = affine_encrypt(a, b, m, text);
+        a_ru = gen_coprime_num(m_ru);
+        b_ru = gen_rand_num(m_ru);
+
+        a_en = gen_coprime_num(m_en);
+        b_en = gen_rand_num(m_en);
+
+        result = affine_encrypt(a_ru, b_ru, m_ru, a_en, b_en, m_en, text);
+
+        wofstream file("keys.txt");
+        file << a_ru << ' ' << b_ru << ' ' << a_en << ' ' << b_en;
+        file.close();
+
       } else {
-        result = affine_decrypt(a, b, m, text);
+        wifstream file("keys.txt");
+
+        if (!file.is_open()) {
+          throw runtime_error(
+              wstring_to_string(L"You have to encrypt the text first"));
+        }
+
+        file >> a_ru >> b_ru >> a_en >> b_en;
+        file.close();
+
+        remove("keys.txt");
+
+        result = affine_decrypt(a_ru, b_ru, m_ru, a_en, b_en, m_en, text);
       }
 
       if (choose_method(L"Do yow want to write the result to a file? (y/n) ")) {
@@ -131,6 +196,7 @@ void affine_menu() {
         wofstream file(wstring_to_string(path));
 
         file << result;
+        file.close();
       } else {
         wcout << result << endl;
       }

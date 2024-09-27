@@ -5,6 +5,7 @@
 
 int main() {
   locale::global(locale("ru_RU.UTF-8"));
+
   try {
     bool log = login();
     if (log) {
