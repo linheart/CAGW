@@ -138,6 +138,8 @@ void polybius_menu() {
         getline(wcin, text);
       }
 
+      text = up_to_lower(text);
+
       if (choice == 1) {
         result = polybius_square_encryption(text);
       } else {
